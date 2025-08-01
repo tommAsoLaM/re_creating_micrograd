@@ -9,7 +9,7 @@ class Value:
         self.label = label
         self._prev = set(children)
         self._backward = lambda : None
-        self.requireGrad = True
+        # self.requireGrad = True
 
     def __add__(self, other):
         other = other if isinstance(other, Value) else Value(other)
@@ -48,12 +48,31 @@ class Value:
     
     def __repr__(self):
         if self.label != '':
-            return f'{self.label}, {self.data}'
+            return f'{self.label}, Value.data = {self.data}'
         else:
-            return f'{self.data}'
+            return f'Value.data = {self.data}'
 
     def __str__(self):
         if self.label != '':
-            return f'{self.label}, {self.data}'
+            return f'{self.label}, Value.data = {self.data}'
         else:
-            return f'{self.data}'
+            return f'Value.data = {self.data}'
+        
+
+    #we need some code to be able to calculate the gradients automaticcaly
+
+    def backward(self):
+        top_ordered = []
+        visited = set()
+        def buildTopo(val):
+            if val not in visited:
+                visited.add(val)
+                for child in val._prev:
+                    buildTopo(child)
+                top_ordered.append(val)
+        
+        buildTopo(self)
+        self.grad = 1.0
+        for cell in reversed(top_ordered):
+            cell._backward()
+                    
