@@ -45,6 +45,20 @@ class Value:
         out._backward = _backward
         return out
 
+    def relu(self):
+        out = Value (data = max(self.data, 0), _op = 'relu', children = (self, ))
+        def _backward():
+            self.grad += (1 if self.data>=0 else 0) * out.grad
+        out._backward = _backward
+        return out
+    
+    def leaky_relu(self):
+        alfa = 0.01
+        out = Value(data = max(self.data, alfa * self.data), _op = 'leaky_relu', children = (self, ))
+        def _backward():
+            self.grad = (1 if self.data>= 0 else alfa) * out.grad
+        out._backward = _backward
+        return out
     
     def __repr__(self):
         if self.label != '':
