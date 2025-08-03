@@ -29,6 +29,24 @@ class Value:
         out._backward = _backward
         return out
     
+    def __pow__(self, exponent):
+        out = Value(self.data**exponent, _op = 'exp')
+        def _backward():
+            self.grad = out * math.log(self.data) * out.grad
+        out._backward = _backward
+        return out
+        
+    def __truediv__(self, other):
+        other = other if other is isinstance(Value) else Value (other)
+        #a/b = a*b^-1
+        out = Value(self.data * other**-1, _op = 'div')
+        def _backward():
+            self.grad += other**-1 * out.grad
+            other.grad += self * out.grad
+            #to be checked
+        out._backward = _backward
+        return out
+
     def tanh(self):
         x = self.data
         out = Value(data = (math.exp(2*x) - 1)/(math.exp(2*x) + 1), children=(self, ), _op = 'tanh')

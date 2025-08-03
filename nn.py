@@ -24,7 +24,7 @@ class Layer:
 
     def __call__(self, x:np.ndarray):
         if x.size != len(self.neurons):
-            raise("Imcompatible sizes of inputs and neuron number")
+            raise("Incompatible sizes of inputs and neuron number")
         result = [neuron(x) for neuron in self.neurons]
         return result[0] if len(result) == 1 else result
     
