@@ -10,7 +10,7 @@ class Neuron:
         self.bias = Value(np.random.random())
         match initilization:
             case '':
-                self.weights = [Value(np.random.random() for _ in range (nin))]
+                self.weights = [Value(np.random.random()) for _ in range (nin)]
             case 'xavier':
                 pass
         #the dropout case will be handled afterwads
