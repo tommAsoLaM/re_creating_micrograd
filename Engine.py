@@ -30,7 +30,7 @@ class Value:
         return out
     
     def __pow__(self, exponent):
-        out = Value(self.data**exponent, _op = 'exp')
+        out = Value(self.data**exponent, _op = 'exp', children= (self, ))
         def _backward():
             self.grad = out * math.log(self.data) * out.grad
         out._backward = _backward
@@ -39,7 +39,7 @@ class Value:
     def __truediv__(self, other):
         other = other if other is isinstance(Value) else Value (other)
         #a/b = a*b^-1
-        out = Value(self.data * other**-1, _op = 'div')
+        out = Value(self.data * other**-1, _op = 'div', childern = (self, other))
         def _backward():
             self.grad += other**-1 * out.grad
             other.grad += self * out.grad
