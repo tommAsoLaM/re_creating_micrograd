@@ -25,8 +25,8 @@ class Layer:
         self.neurons = [Neuron(nin,initilization) for _ in range(nout)]
 
     def __call__(self, x:np.ndarray):
-        if x.size != len(self.neurons):
-            raise("Incompatible sizes of inputs and neuron number")
+        if len(x) != len(self.neurons[0].weights):
+            raise ValueError("Incompatible sizes of inputs and neuron number")
         result = [neuron(x) for neuron in self.neurons]
         return result[0] if len(result) == 1 else result
     
@@ -42,4 +42,4 @@ class MLP:
         for i in range (len(self.layers)):
             output_layer = self.layers[i](x)
             x = output_layer
-        return output_layer[0] if len(output_layer) == 1 else softMax(output_layer)
+        return output_layer
