@@ -19,6 +19,10 @@ class Value:
             other.grad += 1.0 * out.grad
         out._backward = _backward
         return out
+
+    def __radd__(self,other):
+        return self + other
+    
     
     def __sub__(self,other):
         out = self + (-other)
@@ -36,11 +40,21 @@ class Value:
         out._backward = _backward
         return out
     
+    def __rmul__(self,other):
+        return self*other
+
     def exp(self):
         #we are talking about e^x
         out = Value (data = math.exp(self.data), _op = 'exp', children=(self, ))
         def _backward():
             self.grad = self.data * out.grad
+        out._backward = _backward
+        return out
+
+    def log(self):
+        out = Value(data = math.log(self.data), _op = 'log', children = (self, ))
+        def _backward():
+            self.grad += (1/self.data) * out.grad
         out._backward = _backward
         return out
 
@@ -55,6 +69,26 @@ class Value:
         
     def __truediv__(self, other):
         return self * other**-1
+    
+    def __cmp__(self,other):
+        if self.data < other.data: return -1
+        if self.data == other.data: return 0
+        if self.data > other.data: return +1
+
+    def __lt__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        return self.data < other.data
+
+    def __gt__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        return self.data > other.data
+
+    def __eq__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        return self.data == other.data
+
+    def __hash__(self):
+        return id(self)
 
     def tanh(self):
         x = self.data
@@ -89,15 +123,15 @@ class Value:
     
     def __repr__(self):
         if self.label != '':
-            return f'{self.label}, Value.data = {self.data}'
+            return f'{self.label},Value {self.data}'
         else:
-            return f'Value.data = {self.data}'
+            return f'Value {self.data}'
 
     def __str__(self):
         if self.label != '':
-            return f'{self.label}, Value.data = {self.data}'
+            return f'{self.label}, Value {self.data}'
         else:
-            return f'Value.data = {self.data}'
+            return f' Value {self.data}'
         
 
     #we need some code to be able to calculate the gradients automaticcaly

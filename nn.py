@@ -1,17 +1,13 @@
 from re import match
 from Engine import Value
 import numpy as np
-
-def softMax(x:list):
-    out = [xi.exp()/(sum(x.exp())) for xi in x]
-    return out
 class Neuron:
     def __init__(self, nin: int, initilization:str = '', dropout:bool = False):
         
-        self.bias = Value(np.random.random())
+        self.bias = Value(np.random.uniform(-1,1))
         match initilization:
             case '':
-                self.weights = [Value(np.random.random()) for _ in range (nin)]
+                self.weights = [Value(np.random.uniform(-1,1)) for _ in range (nin)]
             case 'xavier':
                 pass
         #the dropout case will be handled afterwads
@@ -19,6 +15,9 @@ class Neuron:
     def __call__(self, x:np.ndarray):
         out = (sum((wi*xi for wi, xi in zip(self.weights, x)), self.bias)).tanh()
         return out
+    
+    def parameters(self):
+        return self.weights + [self.bias]
     
 class Layer:
     def __init__(self, nin, nout, initilization:str = ''):
@@ -29,6 +28,9 @@ class Layer:
             raise ValueError("Incompatible sizes of inputs and neuron number")
         result = [neuron(x) for neuron in self.neurons]
         return result[0] if len(result) == 1 else result
+
+    def parameters(self):
+        return [p for neuron in self.neurons for p in neuron.parameters()]
     
 class MLP:
     def __init__(self, numNeurons:list, initilization:str = ''):
@@ -43,3 +45,6 @@ class MLP:
             output_layer = self.layers[i](x)
             x = output_layer
         return output_layer
+    
+    def parameters(self):
+        return [p for layer in self.layers for p in layer.parameters()]
