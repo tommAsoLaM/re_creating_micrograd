@@ -19,37 +19,36 @@ class Value:
             other.grad += 1.0 * out.grad
         out._backward = _backward
         return out
+    
+    def __sub__(self,other):
+        out = self + (-other)
+        return out
+    
+    def __neg__(self):
+        return self * -1
 
     def __mul__(self,other):
         other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data * other.data, _op = '*', children  = (self, other))
+        out = Value(self.data * other.data, _op = '*', children = (self, other))
         def _backward():
             self.grad += other.data * out.grad
             other.grad += self.data * out.grad
         out._backward = _backward
         return out
     
-    def __pow__(self, exponent):
-        out = Value(self.data**exponent, _op = 'exp', children= (self, ))
+    def __pow__(self, exponent:float):
+        out = Value(self.data**exponent, _op = 'exp', children = (self, ))
         def _backward():
-            self.grad = out * math.log(self.data) * out.grad
+            self.grad = exponent * self.data**(exponent-1) * out.grad
         out._backward = _backward
         return out
         
     def __truediv__(self, other):
-        other = other if other is isinstance(Value) else Value (other)
-        #a/b = a*b^-1
-        out = Value(self.data * other**-1, _op = 'div', childern = (self, other))
-        def _backward():
-            self.grad += other**-1 * out.grad
-            other.grad += self * out.grad
-            #to be checked
-        out._backward = _backward
-        return out
+        return self * other**-1
 
     def tanh(self):
         x = self.data
-        out = Value(data = (math.exp(2*x) - 1)/(math.exp(2*x) + 1), children=(self, ), _op = 'tanh')
+        out = Value(data = (math.exp(2*x) - 1)/(math.exp(2*x) + 1), children = (self, ), _op = 'tanh')
         def _backward():
             self.grad += (1 - out.data**2) * out.grad
         out._backward = _backward
@@ -57,7 +56,7 @@ class Value:
     
     def sigmoid(self):
         x = self.data
-        out = Value (data = (1)/(1 + math.exp(-x)), _op = 'sigmoid', children= (self, ))
+        out = Value (data = (1)/(1 + math.exp(-x)), _op = 'sigmoid', children = (self, ))
         def _backward():
             self.grad += (out.data * (1 - out.data)) * out.grad
         out._backward = _backward
