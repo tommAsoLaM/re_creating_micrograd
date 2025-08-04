@@ -2,8 +2,9 @@ from re import match
 from Engine import Value
 import numpy as np
 
-def softMax(x):
-    return x
+def softMax(x:list):
+    out = [xi.exp()/(sum(x.exp())) for xi in x]
+    return out
 class Neuron:
     def __init__(self, nin: int, initilization:str = '', dropout:bool = False):
         
@@ -16,7 +17,8 @@ class Neuron:
         #the dropout case will be handled afterwads
         
     def __call__(self, x:np.ndarray):
-        return Value(sum((wi.data*xi for wi, xi in zip(self.weights, x)), self.bias))
+        out = (sum((wi*xi for wi, xi in zip(self.weights, x)), self.bias)).tanh()
+        return out
     
 class Layer:
     def __init__(self, nin, nout, initilization:str = ''):
@@ -40,4 +42,4 @@ class MLP:
         for i in range (len(self.layers)):
             output_layer = self.layers[i](x)
             x = output_layer
-        return output_layer[0] if len(output_layer) == 1 else output_layer
+        return output_layer[0] if len(output_layer) == 1 else softMax(output_layer)

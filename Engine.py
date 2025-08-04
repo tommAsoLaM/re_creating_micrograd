@@ -36,7 +36,17 @@ class Value:
         out._backward = _backward
         return out
     
-    def __pow__(self, exponent:float):
+    def exp(self):
+        #we are talking about e^x
+        out = Value (data = math.exp(self.data), _op = 'exp', children=(self, ))
+        def _backward():
+            self.grad = self.data * out.grad
+        out._backward = _backward
+        return out
+
+    def __pow__(self, exponent):
+        if not isinstance(exponent, (int,float)):
+            raise ("exponent must be integer or float")
         out = Value(self.data**exponent, _op = 'exp', children = (self, ))
         def _backward():
             self.grad = exponent * self.data**(exponent-1) * out.grad
