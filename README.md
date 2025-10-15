@@ -53,8 +53,5 @@ l.backward()
 - **Neural Network:** `MLP` builds a feedforward network from layers of `Neuron`.
 - **Loss & Softmax:** `utils.py` provides loss functions and softmax for output normalization.
 
-## License
-
-MIT License
 
 ---
